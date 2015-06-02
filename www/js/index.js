@@ -35,7 +35,7 @@ var app = {
     document.addEventListener('deviceready', this.onDeviceReady, false);
   },
   stopwatch: {
-    targetDuration: (1 * 60 * 1000),
+    targetDuration: (1 * 60 * 1000), // Minutes * 60 * 1000
     initialCount: 0,
     currentCount: 0,
     targetCount: 0,
@@ -43,7 +43,7 @@ var app = {
     elem: null,
     toggleButton: null,
     restartButton: null,
-    animation: null,
+    message: null,
     expired: false
   },
   countdown: function() {
@@ -75,7 +75,7 @@ var app = {
     app.stopwatch.elem = document.getElementById('timer');
     app.stopwatch.toggleButton = document.getElementById('toggleButton');
     app.stopwatch.restartButton = document.getElementById('restartButton');
-    app.stopwatch.animation = document.getElementById('animation');
+    app.stopwatch.message = document.getElementById('message');
     app.stopwatch.expired = false;
 
     app.setTimerState('ready');
@@ -84,6 +84,7 @@ var app = {
     app.stopwatch.initialCount = (new Date).getTime();
     app.stopwatch.currentCount = app.stopwatch.initialCount;
     app.stopwatch.targetCount = app.stopwatch.initialCount + app.stopwatch.targetDuration;
+    app.stopwatch.expired = false;
 
     app.setTimerState('running');
     app.countdown();
@@ -95,13 +96,13 @@ var app = {
   setTimerState: function(state) {
     switch (state) {
       case 'break':
-        app.stopwatch.animation.innerHTML = 'BREAK!';
         document.body.className = 'timer-break';
       case 'ready':
         document.body.className = '';
       case 'ready':
       case 'break':
         app.stopwatch.elem.innerHTML = app.formatTimer(0);
+        app.stopwatch.message.innerHTML = 'Click "Start Work" to begin timing your hour of solid work.';
         app.stopwatch.toggleButton.setAttribute('style', 'display:block;');
         app.stopwatch.restartButton.setAttribute('style', 'display:block;');
         app.stopwatch.toggleButton.innerHTML = 'Start Work';
@@ -113,9 +114,11 @@ var app = {
         break;
       case 'running':
         app.stopwatch.toggleButton.innerHTML = 'Working';
+        app.stopwatch.message.innerHTML = 'Time to work away and be productive! Go go go!';
 
         break;
       case 'enforcer':
+        app.stopwatch.message.innerHTML = 'It\'s time to get up and move around!';
         document.body.className = 'enforcer';
         app.stopwatch.toggleButton.setAttribute('style', 'display:none;');
         app.stopwatch.restartButton.setAttribute('style', 'display:none;');
@@ -219,8 +222,16 @@ var app = {
               return beacon.name == 'BeaconBeta';
             });
 
+            var computerBeacon = _.find(watchData.filteredMicroLocation.beacons, function(beacon) {
+              return beacon.name == 'USBeecon';
+            });
+
             if (app.stopwatch.expired && breakRoomBeacon) {
+              console.log('RESTARTING TIMER COS YOU WENT TO THE ROOM');
               app.restartCountdownTimer();
+            } else if (app.stopwatch.expired && computerBeacon) {
+              console.log('BACK TO THE COMPUTER');
+              app.startCountdownTimer();
             }
         }, logError, beaconWatchOptions);
       watchIdForExitBeacon = com.bluecats.beacons.watchExitBeacon(
@@ -251,7 +262,7 @@ var app = {
       var displayText = description + ' ' + beacons.length + ' beacons: ' + beaconNames.join(',');
       console.log(displayText);
 
-      if (!beaconDisplayList) {
+      /*if (!beaconDisplayList) {
         var appElement = document.querySelector('.app');
         beaconDisplayList = document.createElement('ol');
         beaconDisplayList.setAttribute('id', 'beacons');
@@ -260,7 +271,7 @@ var app = {
 
       var li = document.createElement('li');
       li.appendChild(document.createTextNode(displayText));
-      beaconDisplayList.appendChild(li);
+      beaconDisplayList.appendChild(li);*/
     }
 
     function logError() {
