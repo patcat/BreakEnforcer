@@ -1,0 +1,138 @@
+* {
+  webkit-tap-highlight-color: rgba(0,0,0,0);
+  box-sizing: border-box;
+}
+body {
+  background: #008040;
+  color: #fff;
+  font-family: 'HelveticaNeue-Light', 'HelveticaNeue', Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
+  text-transform: uppercase;
+  webkit-text-size-adjust: none;
+  webkit-touch-callout: none;
+  webkit-user-select: none;
+  width: 100%;
+}
+.app {
+  padding: 20px;
+  text-align: center;
+}
+
+@media screen and (min-aspect-ratio: 1/1) and (min-width:400px) {
+  .app {
+
+  }
+}
+
+h1 {
+  font-size: 36px;
+  font-weight: normal;
+  margin: 0px;
+  overflow: visible;
+  padding: 0px 0px 10px;
+  text-align: center;
+}
+.event {
+  border-radius: 4px;
+  bottom: 10px;
+  color: #FFFFFF;
+  display: block;
+  font-size: 12px;
+  left: 0;
+  margin: 0px 30px;
+  padding: 5px;
+  position: fixed;
+  right: 0;
+  webkit-border-radius: 4px;
+}
+.event.listening {
+  background-color: #333333;
+  display: block;
+}
+.event.received {
+  background-color: #4B946A;
+  display: none;
+}
+@keyframes fade {
+  from {
+    opacity: 1.0;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  to {
+    opacity: 1.0;
+  }
+}
+@-webkit-keyframes fade {
+  from {
+    opacity: 1.0;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  to {
+    opacity: 1.0;
+  }
+}
+.blink {
+  animation: fade 3000ms infinite;
+  webkit-animation: fade 3000ms infinite;
+}
+
+@keyframes enforcer {
+  from {
+    background-color: #FF6666;
+  }
+  50% {
+    background-color: #000;
+  }
+  to {
+    background-color: #FF6666;
+  }
+}
+@-webkit-keyframes enforcer {
+  from {
+    background-color: #FF6666;
+  }
+  50% {
+    background-color: #000;
+  }
+  to {
+    background-color: #FF6666;
+  }
+}
+body.enforcer {
+  animation: enforcer 3000ms infinite;
+  webkit-animation: enforcer 3000ms infinite;
+}
+
+#timer {
+  clear: both;
+  font-size: 30px;
+  padding: 10px 0;
+  width: 100%;
+}
+
+.btns {
+  padding: 0 0 10px;
+}
+.btn {
+  background: #CCFF66;
+  color: #666;
+  float: left;
+  font-size: 14px;
+  margin: 0 0 10px;
+  padding: 10px;
+  text-decoration: none;
+  width: 100%;
+}
+
+.group:after {
+  clear: both;
+  content: "";
+  display: table;
+}

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        id="org.apache.cordova.android-support-library" version="0.0.1">
+    <name>Android Support Plugin</name>
+    <description>The Android Support Library package is a set of code libraries that provide backward-compatible versions of Android framework APIs as well as features that are only available through the library APIs. This plugin provides the Android support library so that multiple Apache Cordova plugins can depend on it without conflict.</description>
+    <license>Apache 2.0</license>
+    <keywords>cordova,android,compatibility</keywords>
+
+    <engines>
+        <engine name="cordova" version=">=3.0.0"/>
+    </engines>
+ 
+    <platform name="android">
+        <source-file src="src/android/android-support-v13.jar" target-dir="libs/" />
+    </platform>
+</plugin>

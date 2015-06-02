@@ -1,0 +1,28 @@
+{
+    "com.bluecats.beacons": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/bluecats/bluecats-phonegap.git",
+            "subdir": "."
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "cordova-plugin-whitelist": {
+        "source": {
+            "type": "registry",
+            "id": "cordova-plugin-whitelist@1"
+        },
+        "is_top_level": true,
+        "variables": {}
+    },
+    "org.apache.cordova.android-support-library": {
+        "source": {
+            "type": "git",
+            "url": "https://github.com/savs/android-support-library",
+            "subdir": "."
+        },
+        "is_top_level": false,
+        "variables": {}
+    }
+}
