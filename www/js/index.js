@@ -102,8 +102,8 @@ var app = {
       case 'ready':
       case 'break':
         app.stopwatch.elem.innerHTML = app.formatTimer(0);
-        console.log('Toggle button is ' + app.stopwatch.toggleButton);
-        console.log('Restart button is ' + app.stopwatch.restartButton);
+        app.stopwatch.toggleButton.setAttribute('style', 'display:block;');
+        app.stopwatch.restartButton.setAttribute('style', 'display:block;');
         app.stopwatch.toggleButton.innerHTML = 'Start Work';
         app.stopwatch.restartButton.innerHTML = 'Reset Timer';
 
@@ -113,15 +113,12 @@ var app = {
         break;
       case 'running':
         app.stopwatch.toggleButton.innerHTML = 'Working';
-        //app.stopwatch.restartButton.innerHTML = 'Restart';
 
-        //app.stopwatch.toggleButton.onclick = app.pauseCountdownTimer;
-        //app.stopwatch.restartButton.onclick = app.restartCountdownTimer;
         break;
       case 'enforcer':
         document.body.className = 'enforcer';
-        app.stopwatch.toggleButton.innerHTML = 'Get up!';
-        app.stopwatch.restartButton.innerHTML = 'Move around!';
+        app.stopwatch.toggleButton.setAttribute('style', 'display:none;');
+        app.stopwatch.restartButton.setAttribute('style', 'display:none;');
 
         app.stopwatch.toggleButton.onclick = null;
         app.stopwatch.restartButton.onclick = null;
@@ -129,17 +126,16 @@ var app = {
   },
   formatTimer: function(time) {
     var _seconds = time / 1000;
-    var _days = Math.floor(_seconds / 86400);
-    _seconds -= _days * 86400;
     var _hours = Math.floor(_seconds / 3600);
     _seconds -= _hours * 3600;
     var _minutes = Math.floor(_seconds / 60);
     _seconds -= _minutes * 60;
 
-    return _days + ':' + app.formatNumber(_hours) + ':' + app.formatNumber(_minutes) + ':' + app.formatNumber(_seconds);
+    return app.formatNumber(_hours) + ':' + app.formatNumber(_minutes) + ':' + app.formatNumber(_seconds);
   },
   formatNumber: function(n) {
-    return (n < 10) ? '0' + Math.round(n) : Math.round(n);
+    var round = Math.floor(n);
+    return (round < 10) ? '0' + round : round;
   },
   // deviceready Event Handler
   //
