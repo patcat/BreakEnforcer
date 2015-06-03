@@ -21,12 +21,6 @@ body {
   text-align: center;
 }
 
-@media screen and (min-aspect-ratio: 1/1) and (min-width:400px) {
-  .app {
-
-  }
-}
-
 h1 {
   font-size: 36px;
   font-weight: normal;
@@ -56,6 +50,7 @@ h1 {
   background-color: #4B946A;
   display: none;
 }
+
 @keyframes fade {
   from {
     opacity: 1.0;
@@ -105,10 +100,6 @@ h1 {
     background-color: #FF6666;
   }
 }
-body.enforcer {
-  animation: enforcer 3000ms infinite;
-  webkit-animation: enforcer 3000ms infinite;
-}
 
 #timer {
   clear: both;
@@ -146,6 +137,19 @@ body.enforcer {
   margin: 20px 40px;
   padding: 20px;
   text-align: center;
+}
+
+body.enforcer {
+  animation: enforcer 3000ms infinite;
+  webkit-animation: enforcer 3000ms infinite;
+}
+
+body.break-success {
+  background-color: #FFFF54;
+
+  .btn {
+    background: #FFDF54;
+  }
 }
 
 @font-face {

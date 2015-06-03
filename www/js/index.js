@@ -35,7 +35,7 @@ var app = {
     document.addEventListener('deviceready', this.onDeviceReady, false);
   },
   stopwatch: {
-    targetDuration: (1 * 60 * 1000), // Minutes * 60 * 1000
+    targetDuration: (30 * 60 * 1000), // Minutes * 60 * 1000
     initialCount: 0,
     currentCount: 0,
     targetCount: 0,
@@ -44,7 +44,8 @@ var app = {
     toggleButton: null,
     restartButton: null,
     message: null,
-    expired: false
+    expired: false,
+    state: ''
   },
   countdown: function() {
     console.log('..... COUNTING DOWN');
@@ -61,7 +62,7 @@ var app = {
     if (timeLeft <= 0) {
       console.log('TIMER FINISHED!');
       app.setTimerState('enforcer');
-      app.stopwatch.expired = true;
+      app.stopwatch.state = 'expired';
       clearTimeout(app.stopwatch.timeout);
     } else {
       app.stopwatch.timeout = setTimeout(app.countdown, 100); // Check every 100 milliseconds
@@ -76,7 +77,7 @@ var app = {
     app.stopwatch.toggleButton = document.getElementById('toggleButton');
     app.stopwatch.restartButton = document.getElementById('restartButton');
     app.stopwatch.message = document.getElementById('message');
-    app.stopwatch.expired = false;
+    app.stopwatch.state = 'ready';
 
     app.setTimerState('ready');
   },
@@ -84,23 +85,27 @@ var app = {
     app.stopwatch.initialCount = (new Date).getTime();
     app.stopwatch.currentCount = app.stopwatch.initialCount;
     app.stopwatch.targetCount = app.stopwatch.initialCount + app.stopwatch.targetDuration;
-    app.stopwatch.expired = false;
+    app.stopwatch.state = 'running';
 
     app.setTimerState('running');
     app.countdown();
   },
   restartCountdownTimer: function() {
     clearTimeout(app.stopwatch.timeout);
+    app.stopwatch.state = 'ready';
+
     app.setTimerState('ready');
+  },
+  runBreakMode: function() {
+    clearTimeout(app.stopwatch.timeout);
+    app.stopwatch.state = 'breaksuccess';
+
+    app.setTimerState('breaksuccess');
   },
   setTimerState: function(state) {
     switch (state) {
-      case 'break':
-        document.body.className = 'timer-break';
       case 'ready':
         document.body.className = '';
-      case 'ready':
-      case 'break':
         app.stopwatch.elem.innerHTML = app.formatTimer(0);
         app.stopwatch.message.innerHTML = 'Click "Start Work" to begin timing your hour of solid work.';
         app.stopwatch.toggleButton.setAttribute('style', 'display:block;');
@@ -113,18 +118,34 @@ var app = {
 
         break;
       case 'running':
-        app.stopwatch.toggleButton.innerHTML = 'Working';
+        document.body.className = 'running';
         app.stopwatch.message.innerHTML = 'Time to work away and be productive! Go go go!';
+        app.stopwatch.toggleButton.setAttribute('style', 'display:block;');
+        app.stopwatch.restartButton.setAttribute('style', 'display:block;');
+        app.stopwatch.toggleButton.innerHTML = 'Working';
+
+        app.stopwatch.toggleButton.onclick = app.startCountdownTimer;
+        app.stopwatch.restartButton.onclick = app.restartCountdownTimer;
 
         break;
       case 'enforcer':
-        app.stopwatch.message.innerHTML = 'It\'s time to get up and move around!';
         document.body.className = 'enforcer';
+        app.stopwatch.message.innerHTML = 'It\'s time to get up and move around!';
         app.stopwatch.toggleButton.setAttribute('style', 'display:none;');
         app.stopwatch.restartButton.setAttribute('style', 'display:none;');
 
         app.stopwatch.toggleButton.onclick = null;
         app.stopwatch.restartButton.onclick = null;
+        break;
+      case 'breaksuccess':
+        document.body.className = 'break-success';
+        app.stopwatch.elem.innerHTML = app.formatTimer(0);
+        app.stopwatch.message.innerHTML = 'Thank you! You may return to work.';
+        app.stopwatch.toggleButton.setAttribute('style', 'display:block;');
+        app.stopwatch.toggleButton.innerHTML = 'Return to Work';
+
+        app.stopwatch.toggleButton.onclick = app.startCountdownTimer;
+        break;
     }
   },
   formatTimer: function(time) {
@@ -226,10 +247,10 @@ var app = {
               return beacon.name == 'USBeecon';
             });
 
-            if (app.stopwatch.expired && breakRoomBeacon) {
+            if (app.stopwatch.state == 'expired' && breakRoomBeacon) {
               console.log('RESTARTING TIMER COS YOU WENT TO THE ROOM');
-              app.restartCountdownTimer();
-            } else if (app.stopwatch.expired && computerBeacon) {
+              app.runBreakMode();
+            } else if (app.stopwatch.state == 'breaksuccess' && computerBeacon) {
               console.log('BACK TO THE COMPUTER');
               app.startCountdownTimer();
             }
