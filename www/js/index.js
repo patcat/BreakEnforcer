@@ -35,7 +35,7 @@ var app = {
     document.addEventListener('deviceready', this.onDeviceReady, false);
   },
   stopwatch: {
-    targetDuration: (30 * 60 * 1000), // Minutes * 60 * 1000
+    targetDuration: (1 * 60 * 1000), // Minutes * 60 * 1000
     initialCount: 0,
     currentCount: 0,
     targetCount: 0,
@@ -48,31 +48,21 @@ var app = {
     state: ''
   },
   countdown: function() {
-    console.log('..... COUNTING DOWN');
-    //console.log('...... Time difference is ' + ((new Date).getTime() - app.stopwatch.currentCount));
-
-    //app.stopwatch.currentCount -= 100;
     app.stopwatch.currentCount = (new Date).getTime();
 
     var timeLeft = app.stopwatch.targetCount - app.stopwatch.currentCount; 
-    //var timeLeft = app.stopwatch.currentCount;
-    console.log('....... Time left is ' + timeLeft);
 
-    //if (app.stopwatch.targetCount <= app.stopwatch.currentCount) {
     if (timeLeft <= 0) {
-      console.log('TIMER FINISHED!');
       app.setTimerState('enforcer');
       app.stopwatch.state = 'expired';
       clearTimeout(app.stopwatch.timeout);
     } else {
-      app.stopwatch.timeout = setTimeout(app.countdown, 100); // Check every 100 milliseconds
+      app.stopwatch.timeout = setTimeout(app.countdown, 500); // Check every 500 milliseconds
       
       app.stopwatch.elem.innerHTML = app.formatTimer(timeLeft);
     }
   },
   initCountdownTimer: function() {
-    console.log('... Initializing countdown timer.');
-
     app.stopwatch.elem = document.getElementById('timer');
     app.stopwatch.toggleButton = document.getElementById('toggleButton');
     app.stopwatch.restartButton = document.getElementById('restartButton');
@@ -197,7 +187,7 @@ var app = {
     }
 
     var sdkOptions = {
-      useLocalStorage:true
+      useLocalStorage: true
     };
 
     var beaconWatchOptions = {
@@ -221,22 +211,16 @@ var app = {
     }
 
     function watchBeaconEntryAndExit() {
-      console.log('About to look for beacons');
-      console.log('watchIdForEnterBeacon: ' + watchIdForEnterBeacon);
-      console.log('watchIdForExitBeacon: ' + watchIdForExitBeacon);
       if (watchIdForEnterBeacon != null) {
-        console.log('watchIdForEnterBeacon is not null');
         com.bluecats.beacons.clearWatch(watchIdForEnterBeacon);
       };
 
       if (watchIdForExitBeacon != null) {
-        console.log('watchIdForExitBeacon is not null');
         com.bluecats.beacons.clearWatch(watchIdForExitBeacon);
       };
 
       watchIdForEnterBeacon = com.bluecats.beacons.watchEnterBeacon(
         function(watchData){
-            console.log('Entered watchIdForEnterBeacon!' + watchData);
             displayBeacons('Entered', watchData);
 
             var breakRoomBeacon = _.find(watchData.filteredMicroLocation.beacons, function(beacon) {
@@ -247,11 +231,12 @@ var app = {
               return beacon.name == 'USBeecon';
             });
 
+            // Room was entered, break successful
             if (app.stopwatch.state == 'expired' && breakRoomBeacon) {
-              console.log('RESTARTING TIMER COS YOU WENT TO THE ROOM');
               app.runBreakMode();
-            } else if (app.stopwatch.state == 'breaksuccess' && computerBeacon) {
-              console.log('BACK TO THE COMPUTER');
+            }
+            // Back at the computer
+            else if (app.stopwatch.state == 'breaksuccess' && computerBeacon) {
               app.startCountdownTimer();
             }
         }, logError, beaconWatchOptions);
@@ -282,17 +267,6 @@ var app = {
 
       var displayText = description + ' ' + beacons.length + ' beacons: ' + beaconNames.join(',');
       console.log(displayText);
-
-      /*if (!beaconDisplayList) {
-        var appElement = document.querySelector('.app');
-        beaconDisplayList = document.createElement('ol');
-        beaconDisplayList.setAttribute('id', 'beacons');
-        appElement.appendChild(beaconDisplayList);
-      }
-
-      var li = document.createElement('li');
-      li.appendChild(document.createTextNode(displayText));
-      beaconDisplayList.appendChild(li);*/
     }
 
     function logError() {
