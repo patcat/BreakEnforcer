@@ -21,20 +21,29 @@
 var blueCatsAppToken = '9e93e60f-55f3-4632-bede-8e8a91974651';
 
 var app = {
-  // Application Constructor
+  /* ---------------------------------------------
+   *
+   *  App initialization
+   *
+   * -------------------------------------------*/
   initialize: function() {
-    console.log('INITIALIZING APPLICATION');
     this.bindEvents();
     this.initCountdownTimer();
   },
-  // Bind Event Listeners
-  //
-  // Bind any events that are required on startup. Common events are:
-  // 'load', 'deviceready', 'offline', and 'online'.
   bindEvents: function() {
     document.addEventListener('deviceready', this.onDeviceReady, false);
   },
-  stopwatch: {
+  onDeviceReady: function() {
+    app.receivedEvent('received');
+    app.watchBeacons();
+  },
+
+  /* ---------------------------------------------
+   *
+   *  Countdown timer
+   *
+   * -------------------------------------------*/
+  timer: {
     targetDuration: (1 * 60 * 1000), // Minutes * 60 * 1000
     initialCount: 0,
     currentCount: 0,
@@ -47,123 +56,120 @@ var app = {
     expired: false,
     state: ''
   },
-  countdown: function() {
-    app.stopwatch.currentCount = (new Date).getTime();
-
-    var timeLeft = app.stopwatch.targetCount - app.stopwatch.currentCount; 
-
-    if (timeLeft <= 0) {
-      app.setTimerState('enforcer');
-      app.stopwatch.state = 'expired';
-      clearTimeout(app.stopwatch.timeout);
-    } else {
-      app.stopwatch.timeout = setTimeout(app.countdown, 500); // Check every 500 milliseconds
-      
-      app.stopwatch.elem.innerHTML = app.formatTimer(timeLeft);
-    }
-  },
   initCountdownTimer: function() {
-    app.stopwatch.elem = document.getElementById('timer');
-    app.stopwatch.toggleButton = document.getElementById('toggleButton');
-    app.stopwatch.restartButton = document.getElementById('restartButton');
-    app.stopwatch.message = document.getElementById('message');
-    app.stopwatch.state = 'ready';
+    app.timer.elem = document.getElementById('timer');
+    app.timer.toggleButton = document.getElementById('toggleButton');
+    app.timer.restartButton = document.getElementById('restartButton');
+    app.timer.message = document.getElementById('message');
+    app.timer.state = 'ready';
 
     app.setTimerState('ready');
   },
   startCountdownTimer: function() {
-    app.stopwatch.initialCount = (new Date).getTime();
-    app.stopwatch.currentCount = app.stopwatch.initialCount;
-    app.stopwatch.targetCount = app.stopwatch.initialCount + app.stopwatch.targetDuration;
-    app.stopwatch.state = 'running';
+    app.timer.initialCount = (new Date).getTime();
+    app.timer.currentCount = app.timer.initialCount;
+    app.timer.targetCount = app.timer.initialCount + app.timer.targetDuration;
+    app.timer.state = 'running';
 
     app.setTimerState('running');
     app.countdown();
   },
   restartCountdownTimer: function() {
-    clearTimeout(app.stopwatch.timeout);
-    app.stopwatch.state = 'ready';
+    clearTimeout(app.timer.timeout);
+    app.timer.state = 'ready';
 
     app.setTimerState('ready');
   },
   runBreakMode: function() {
-    clearTimeout(app.stopwatch.timeout);
-    app.stopwatch.state = 'breaksuccess';
+    clearTimeout(app.timer.timeout);
+    app.timer.state = 'breaksuccess';
 
     app.setTimerState('breaksuccess');
+  },
+  countdown: function() {
+    app.timer.currentCount = (new Date).getTime();
+
+    var timeLeft = app.timer.targetCount - app.timer.currentCount; 
+
+    if (timeLeft <= 0) {
+      app.setTimerState('enforcer');
+      app.timer.state = 'expired';
+      clearTimeout(app.timer.timeout);
+    } else {
+      app.timer.timeout = setTimeout(app.countdown, 500); // Check every 500 milliseconds
+      
+      app.timer.elem.innerHTML = app.formatTimer(timeLeft);
+    }
   },
   setTimerState: function(state) {
     switch (state) {
       case 'ready':
         document.body.className = '';
-        app.stopwatch.elem.innerHTML = app.formatTimer(0);
-        app.stopwatch.message.innerHTML = 'Click "Start Work" to begin timing your hour of solid work.';
-        app.stopwatch.toggleButton.setAttribute('style', 'display:block;');
-        app.stopwatch.restartButton.setAttribute('style', 'display:block;');
-        app.stopwatch.toggleButton.innerHTML = 'Start Work';
-        app.stopwatch.restartButton.innerHTML = 'Reset Timer';
+        app.timer.elem.innerHTML = app.formatTimer(0);
+        app.timer.message.innerHTML = 'Click "Start Work" to begin timing your hour of solid work.';
+        app.timer.toggleButton.setAttribute('style', 'display:block;');
+        app.timer.restartButton.setAttribute('style', 'display:block;');
+        app.timer.toggleButton.innerHTML = 'Start Work';
+        app.timer.restartButton.innerHTML = 'Reset Timer';
 
-        app.stopwatch.toggleButton.onclick = app.startCountdownTimer;
-        app.stopwatch.restartButton.onclick = app.restartCountdownTimer;
+        app.timer.toggleButton.onclick = app.startCountdownTimer;
+        app.timer.restartButton.onclick = app.restartCountdownTimer;
 
         break;
       case 'running':
         document.body.className = 'running';
-        app.stopwatch.message.innerHTML = 'Time to work away and be productive! Go go go!';
-        app.stopwatch.toggleButton.setAttribute('style', 'display:block;');
-        app.stopwatch.restartButton.setAttribute('style', 'display:block;');
-        app.stopwatch.toggleButton.innerHTML = 'Working';
+        app.timer.message.innerHTML = 'Time to work away and be productive! Go go go!';
+        app.timer.toggleButton.setAttribute('style', 'display:block;');
+        app.timer.restartButton.setAttribute('style', 'display:block;');
+        app.timer.toggleButton.innerHTML = 'Working';
 
-        app.stopwatch.toggleButton.onclick = app.startCountdownTimer;
-        app.stopwatch.restartButton.onclick = app.restartCountdownTimer;
+        app.timer.toggleButton.onclick = app.startCountdownTimer;
+        app.timer.restartButton.onclick = app.restartCountdownTimer;
 
         break;
       case 'enforcer':
         document.body.className = 'enforcer';
-        app.stopwatch.message.innerHTML = 'It\'s time to get up and move around!';
-        app.stopwatch.toggleButton.setAttribute('style', 'display:none;');
-        app.stopwatch.restartButton.setAttribute('style', 'display:none;');
+        app.timer.message.innerHTML = 'It\'s time to get up and move around!';
+        app.timer.toggleButton.setAttribute('style', 'display:none;');
+        app.timer.restartButton.setAttribute('style', 'display:none;');
 
-        app.stopwatch.toggleButton.onclick = null;
-        app.stopwatch.restartButton.onclick = null;
+        app.timer.toggleButton.onclick = null;
+        app.timer.restartButton.onclick = null;
         break;
       case 'breaksuccess':
         document.body.className = 'break-success';
-        app.stopwatch.elem.innerHTML = app.formatTimer(0);
-        app.stopwatch.message.innerHTML = 'Thank you! You may return to work.';
-        app.stopwatch.toggleButton.setAttribute('style', 'display:block;');
-        app.stopwatch.toggleButton.innerHTML = 'Return to Work';
+        app.timer.elem.innerHTML = app.formatTimer(0);
+        app.timer.message.innerHTML = 'Thank you! You may return to work.';
+        app.timer.toggleButton.setAttribute('style', 'display:block;');
+        app.timer.toggleButton.innerHTML = 'Return to Work';
 
-        app.stopwatch.toggleButton.onclick = app.startCountdownTimer;
+        app.timer.toggleButton.onclick = app.startCountdownTimer;
         break;
     }
   },
   formatTimer: function(time) {
-    var _seconds = time / 1000;
-    var _hours = Math.floor(_seconds / 3600);
-    _seconds -= _hours * 3600;
-    var _minutes = Math.floor(_seconds / 60);
-    _seconds -= _minutes * 60;
+    var seconds = time / 1000;
+    var hours = Math.floor(seconds / 3600);
+    seconds -= hours * 3600;
+    var minutes = Math.floor(seconds / 60);
+    seconds -= minutes * 60;
 
-    return app.formatNumber(_hours) + ':' + app.formatNumber(_minutes) + ':' + app.formatNumber(_seconds);
+    return app.formatNumber(hours) + ':' + app.formatNumber(minutes) + ':' + app.formatNumber(seconds);
   },
   formatNumber: function(n) {
     var round = Math.floor(n);
     return (round < 10) ? '0' + round : round;
   },
-  // deviceready Event Handler
-  //
-  // The scope of 'this' is the event. In order to call the 'receivedEvent'
-  // function, we must explicity call 'app.receivedEvent(...);'
-  onDeviceReady: function() {
-    app.receivedEvent('received');
-    app.watchBeacons();
-  },
-  // Update DOM on a Received Event
+
+  /* ---------------------------------------------
+   *
+   *  BlueCat Beacon magic
+   *
+   * -------------------------------------------*/
   receivedEvent: function(event) {
-    var parentElement = document.getElementById('deviceready');
-    var listeningElement = parentElement.querySelector('.listening');
-    var receivedElement = parentElement.querySelector('.received');
+    var parentElement = document.getElementById('deviceready'),
+        listeningElement = parentElement.querySelector('.listening'),
+        receivedElement = parentElement.querySelector('.received');
 
     listeningElement.setAttribute('style', 'display:none;');
     receivedElement.setAttribute('style', 'display:block;');
@@ -171,14 +177,14 @@ var app = {
     if (event == 'apptokenrequired') {
       receivedElement.innerHTML = 'App token not set'
     } else if (event == 'bluecatspurring') {
-      receivedElement.innerHTML = 'Looking for beacons'
+      // We are on the look out for beacons
+      receivedElement.setAttribute('style', 'display:none;');
     };
 
     console.log('Received Event: ' + event);
   },
   watchBeacons: function() {
-    var watchIdForEnterBeacon,watchIdForExitBeacon,watchIdForClosestBeacon = null;
-    var beaconDisplayList = null;
+    var watchIdForEnterBeacon = null;
 
     if (blueCatsAppToken == 'BLUECATS-APP-TOKEN') {
       //BlueCats app token hasn't been configured
@@ -191,32 +197,18 @@ var app = {
     };
 
     var beaconWatchOptions = {
-      filter: {
-        //Configure additional filters here e.g.
-        //sitesName:['BlueCats HQ', 'Another Site'],
-        //categoriesNamed:['Entrance'],
-        //maximumAccuracy:0.5
-        //etc.
-      }
+      minimumTriggerIntervalInSeconds: 5,
+      filter: {}
     };
-
-    com.bluecats.beacons.startPurringWithAppToken(
-      blueCatsAppToken, purringSuccess, logError, sdkOptions
-    );
 
     function purringSuccess() {
       app.receivedEvent('bluecatspurring');
-      watchBeaconEntryAndExit();
-      watchClosestBeacon();
+      watchBeaconEntry();
     }
 
-    function watchBeaconEntryAndExit() {
+    function watchBeaconEntry() {
       if (watchIdForEnterBeacon != null) {
         com.bluecats.beacons.clearWatch(watchIdForEnterBeacon);
-      };
-
-      if (watchIdForExitBeacon != null) {
-        com.bluecats.beacons.clearWatch(watchIdForExitBeacon);
       };
 
       watchIdForEnterBeacon = com.bluecats.beacons.watchEnterBeacon(
@@ -232,30 +224,19 @@ var app = {
             });
 
             // Room was entered, break successful
-            if (app.stopwatch.state == 'expired' && breakRoomBeacon) {
+            if (app.timer.state == 'expired' && breakRoomBeacon) {
               app.runBreakMode();
             }
             // Back at the computer
-            else if (app.stopwatch.state == 'breaksuccess' && computerBeacon) {
+            else if (app.timer.state == 'breaksuccess' && computerBeacon) {
               app.startCountdownTimer();
             }
         }, logError, beaconWatchOptions);
-      watchIdForExitBeacon = com.bluecats.beacons.watchExitBeacon(
-        function(watchData){
-            displayBeacons('Exited', watchData);
-        }, logError, beaconWatchOptions);
     }
 
-    function watchClosestBeacon() {
-      if (watchIdForClosestBeacon != null) {
-        com.bluecats.beacons.clearWatch(watchIdForClosestBeacon);
-      };
-
-      watchIdForClosestBeacon = com.bluecats.beacons.watchClosestBeaconChange(
-        function(watchData) {
-            displayBeacons('Closest to', watchData);
-        }, logError, beaconWatchOptions);
-    }
+    com.bluecats.beacons.startPurringWithAppToken(
+      blueCatsAppToken, purringSuccess, logError, sdkOptions
+    );
 
     function displayBeacons(description, watchData) {
       var beacons = watchData.filteredMicroLocation.beacons;
