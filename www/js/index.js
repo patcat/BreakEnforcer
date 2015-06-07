@@ -44,7 +44,7 @@ var app = {
    *
    * -------------------------------------------*/
   timer: {
-    targetDuration: (1 * 60 * 1000), // Minutes * 60 * 1000
+    targetDuration: (30 * 60 * 1000), // Minutes * 60 * 1000
     initialCount: 0,
     currentCount: 0,
     targetCount: 0,
