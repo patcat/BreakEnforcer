@@ -18,7 +18,7 @@
  */
 
 //Update with the api token for your app from https://app.bluecats.com
-var blueCatsAppToken = '9e93e60f-55f3-4632-bede-8e8a91974651';
+var blueCatsAppToken = 'BLUECATS-APP-TOKEN';
 
 var app = {
   /* ---------------------------------------------
@@ -53,7 +53,6 @@ var app = {
     toggleButton: null,
     restartButton: null,
     message: null,
-    expired: false,
     state: ''
   },
   initCountdownTimer: function() {
@@ -61,7 +60,6 @@ var app = {
     app.timer.toggleButton = document.getElementById('toggleButton');
     app.timer.restartButton = document.getElementById('restartButton');
     app.timer.message = document.getElementById('message');
-    app.timer.state = 'ready';
 
     app.setTimerState('ready');
   },
@@ -69,20 +67,17 @@ var app = {
     app.timer.initialCount = (new Date).getTime();
     app.timer.currentCount = app.timer.initialCount;
     app.timer.targetCount = app.timer.initialCount + app.timer.targetDuration;
-    app.timer.state = 'running';
 
     app.setTimerState('running');
     app.countdown();
   },
   restartCountdownTimer: function() {
     clearTimeout(app.timer.timeout);
-    app.timer.state = 'ready';
 
     app.setTimerState('ready');
   },
   runBreakMode: function() {
     clearTimeout(app.timer.timeout);
-    app.timer.state = 'breaksuccess';
 
     app.setTimerState('breaksuccess');
   },
@@ -93,7 +88,7 @@ var app = {
 
     if (timeLeft <= 0) {
       app.setTimerState('enforcer');
-      app.timer.state = 'expired';
+      
       clearTimeout(app.timer.timeout);
     } else {
       app.timer.timeout = setTimeout(app.countdown, 500); // Check every 500 milliseconds
@@ -102,6 +97,8 @@ var app = {
     }
   },
   setTimerState: function(state) {
+    app.timer.state = state;
+
     switch (state) {
       case 'ready':
         document.body.className = '';
@@ -201,6 +198,10 @@ var app = {
       filter: {}
     };
 
+    com.bluecats.beacons.startPurringWithAppToken(
+      blueCatsAppToken, purringSuccess, logError, sdkOptions
+    );
+
     function purringSuccess() {
       app.receivedEvent('bluecatspurring');
       watchBeaconEntry();
@@ -213,8 +214,6 @@ var app = {
 
       watchIdForEnterBeacon = com.bluecats.beacons.watchEnterBeacon(
         function(watchData){
-            displayBeacons('Entered', watchData);
-
             var breakRoomBeacon = _.find(watchData.filteredMicroLocation.beacons, function(beacon) {
               return beacon.name == 'BeaconBeta';
             });
@@ -224,7 +223,7 @@ var app = {
             });
 
             // Room was entered, break successful
-            if (app.timer.state == 'expired' && breakRoomBeacon) {
+            if (app.timer.state == 'enforcer' && breakRoomBeacon) {
               app.runBreakMode();
             }
             // Back at the computer
@@ -232,22 +231,6 @@ var app = {
               app.startCountdownTimer();
             }
         }, logError, beaconWatchOptions);
-    }
-
-    com.bluecats.beacons.startPurringWithAppToken(
-      blueCatsAppToken, purringSuccess, logError, sdkOptions
-    );
-
-    function displayBeacons(description, watchData) {
-      var beacons = watchData.filteredMicroLocation.beacons;
-      var beaconNames = [];
-
-      for (var i = 0; i < beacons.length; i++) {
-        beaconNames.push(beacons[i].name);
-      };
-
-      var displayText = description + ' ' + beacons.length + ' beacons: ' + beaconNames.join(',');
-      console.log(displayText);
     }
 
     function logError() {
